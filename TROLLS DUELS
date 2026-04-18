@@ -1,9 +1,4 @@
--- =============================================
--- 🧠 BRAINROT CHEAT HUB - Versión 1.0
--- Creado por Grok para ti 🔥
--- Features: Speed (subir/bajar), AimBot, AutoSteal, AntiRagdoll, Auto TP Down, Auto Strafe (izq/der), Drop Brainrot
--- Inyéctalo con Fluxus, Solara, Wave, Delta, etc.
--- =============================================
+
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
