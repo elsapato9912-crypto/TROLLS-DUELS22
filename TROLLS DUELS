@@ -1,0 +1,253 @@
+-- =============================================
+-- 🧠 BRAINROT CHEAT HUB - Versión 1.0
+-- Creado por Grok para ti 🔥
+-- Features: Speed (subir/bajar), AimBot, AutoSteal, AntiRagdoll, Auto TP Down, Auto Strafe (izq/der), Drop Brainrot
+-- Inyéctalo con Fluxus, Solara, Wave, Delta, etc.
+-- =============================================
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+
+-- Variables globales del cheat
+getgenv().Brainrot = {
+    Speed = 50,
+    AimBot = false,
+    AutoSteal = false,
+    AntiRagdoll = false,
+    AutoTPDown = false,
+    AutoStrafe = false,
+    DropBrainrot = false
+}
+
+-- ==================== GUI ====================
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "BrainrotHub"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = player:WaitForChild("PlayerGui")
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 340, 0, 480)
+MainFrame.Position = UDim2.new(0.5, -170, 0.5, -240)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = ScreenGui
+
+-- Esquinas redondeadas
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = MainFrame
+
+-- Título
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 60)
+Title.BackgroundTransparency = 1
+Title.Text = "🧠 BRAINROT CHEAT"
+Title.TextColor3 = Color3.fromRGB(255, 0, 255)
+Title.TextScaled = true
+Title.Font = Enum.Font.GothamBlack
+Title.Parent = MainFrame
+
+local TitleCorner = Instance.new("UICorner")
+TitleCorner.CornerRadius = UDim.new(0, 12)
+TitleCorner.Parent = Title
+
+-- Velocidad
+local SpeedLabel = Instance.new("TextLabel")
+SpeedLabel.Size = UDim2.new(0.9, 0, 0, 35)
+SpeedLabel.Position = UDim2.new(0.05, 0, 0, 70)
+SpeedLabel.BackgroundTransparency = 1
+SpeedLabel.Text = "Velocidad: 50"
+SpeedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedLabel.TextScaled = true
+SpeedLabel.Font = Enum.Font.GothamBold
+SpeedLabel.Parent = MainFrame
+
+local SpeedUp = Instance.new("TextButton")
+SpeedUp.Size = UDim2.new(0.4, 0, 0, 40)
+SpeedUp.Position = UDim2.new(0.05, 0, 0, 115)
+SpeedUp.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+SpeedUp.Text = "+ SPEED"
+SpeedUp.TextColor3 = Color3.fromRGB(0, 0, 0)
+SpeedUp.TextScaled = true
+SpeedUp.Font = Enum.Font.GothamBold
+SpeedUp.Parent = MainFrame
+local UpCorner = Instance.new("UICorner"); UpCorner.CornerRadius = UDim.new(0, 8); UpCorner.Parent = SpeedUp
+
+local SpeedDown = Instance.new("TextButton")
+SpeedDown.Size = UDim2.new(0.4, 0, 0, 40)
+SpeedDown.Position = UDim2.new(0.55, 0, 0, 115)
+SpeedDown.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
+SpeedDown.Text = "- SPEED"
+SpeedDown.TextColor3 = Color3.fromRGB(0, 0, 0)
+SpeedDown.TextScaled = true
+SpeedDown.Font = Enum.Font.GothamBold
+SpeedDown.Parent = MainFrame
+local DownCorner = Instance.new("UICorner"); DownCorner.CornerRadius = UDim.new(0, 8); DownCorner.Parent = SpeedDown
+
+-- Función para crear toggles bonitos
+local function CreateToggle(name, posY, default)
+    local ToggleFrame = Instance.new("Frame")
+    ToggleFrame.Size = UDim2.new(0.9, 0, 0, 45)
+    ToggleFrame.Position = UDim2.new(0.05, 0, 0, posY)
+    ToggleFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    ToggleFrame.Parent = MainFrame
+    local TCorner = Instance.new("UICorner"); TCorner.CornerRadius = UDim.new(0, 10); TCorner.Parent = ToggleFrame
+
+    local Label = Instance.new("TextLabel")
+    Label.Size = UDim2.new(0.7, 0, 1, 0)
+    Label.BackgroundTransparency = 1
+    Label.Text = name
+    Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.TextScaled = true
+    Label.Font = Enum.Font.GothamSemibold
+    Label.Parent = ToggleFrame
+
+    local Button = Instance.new("TextButton")
+    Button.Size = UDim2.new(0.25, 0, 0.7, 0)
+    Button.Position = UDim2.new(0.72, 0, 0.15, 0)
+    Button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    Button.Text = "OFF"
+    Button.TextColor3 = Color3.fromRGB(255, 50, 50)
+    Button.TextScaled = true
+    Button.Font = Enum.Font.GothamBold
+    Button.Parent = ToggleFrame
+    local BCorner = Instance.new("UICorner"); BCorner.CornerRadius = UDim.new(0, 8); BCorner.Parent = Button
+
+    local toggled = default or false
+    Button.MouseButton1Click:Connect(function()
+        toggled = not toggled
+        getgenv().Brainrot[name] = toggled
+        
+        if toggled then
+            Button.Text = "ON"
+            Button.TextColor3 = Color3.fromRGB(0, 255, 100)
+            Button.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+        else
+            Button.Text = "OFF"
+            Button.TextColor3 = Color3.fromRGB(255, 50, 50)
+            Button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        end
+    end)
+    
+    return ToggleFrame
+end
+
+-- Crear todos los toggles
+CreateToggle("AimBot", 180, false)
+CreateToggle("AutoSteal", 235, false)
+CreateToggle("AntiRagdoll", 290, false)
+CreateToggle("AutoTPDown", 345, false)
+CreateToggle("AutoStrafe", 400, false)
+CreateToggle("DropBrainrot", 455, false)
+
+-- Botón para cerrar (opcional)
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 30, 0, 30)
+CloseBtn.Position = UDim2.new(1, -40, 0, 10)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
+CloseBtn.Text = "✕"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.TextScaled = true
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.Parent = MainFrame
+local CloseCorner = Instance.new("UICorner"); CloseCorner.CornerRadius = UDim.new(1, 0); CloseCorner.Parent = CloseBtn
+CloseBtn.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+-- ==================== LÓGICA DEL CHEAT ====================
+local connection
+connection = RunService.RenderStepped:Connect(function()
+    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then return end
+    
+    local char = player.Character
+    local hum = char:FindFirstChild("Humanoid")
+    local root = char:FindFirstChild("HumanoidRootPart")
+    
+    if not hum or not root then return end
+
+    -- Speed
+    hum.WalkSpeed = getgenv().Brainrot.Speed
+
+    -- AimBot (Cam Lock - muy fuerte)
+    if getgenv().Brainrot.AimBot then
+        local closest = nil
+        local shortest = math.huge
+        
+        for _, plr in ipairs(Players:GetPlayers()) do
+            if plr ~= player and plr.Character and plr.Character:FindFirstChild("Head") then
+                local head = plr.Character.Head
+                local distance = (head.Position - camera.CFrame.Position).Magnitude
+                if distance < shortest and distance < 400 then
+                    shortest = distance
+                    closest = head
+                end
+            end
+        end
+        
+        if closest then
+            camera.CFrame = CFrame.lookAt(camera.CFrame.Position, closest.Position)
+        end
+    end
+
+    -- AutoSteal (roba herramientas y objetos cercanos)
+    if getgenv().Brainrot.AutoSteal then
+        for _, obj in ipairs(workspace:GetDescendants()) do
+            if obj:IsA("Tool") or obj:IsA("Accessory") then
+                if obj.Parent ~= char and (obj:FindFirstChild("Handle") or obj:FindFirstChild("PrimaryPart")) then
+                    local handle = obj:FindFirstChild("Handle") or obj.PrimaryPart
+                    if handle and (handle.Position - root.Position).Magnitude < 40 then
+                        obj.Parent = char
+                    end
+                end
+            end
+        end
+    end
+
+    -- AntiRagdoll
+    if getgenv().Brainrot.AntiRagdoll then
+        hum.PlatformStand = false
+        hum.Sit = false
+        hum:ChangeState(Enum.HumanoidStateType.Running)
+        if hum:FindFirstChild("Ragdolled") then hum.Ragdolled.Value = false end
+    end
+
+    -- Auto TP Down (teletransporta al suelo automáticamente)
+    if getgenv().Brainrot.AutoTPDown then
+        local ray = Ray.new(root.Position, Vector3.new(0, -500, 0))
+        local hit, pos = workspace:FindPartOnRayWithIgnoreList(ray, {char})
+        if hit and pos then
+            root.CFrame = CFrame.new(pos + Vector3.new(0, 4, 0))
+        end
+    end
+
+    -- Auto Strafe (izquierda ↔ derecha automático)
+    if getgenv().Brainrot.AutoStrafe then
+        local t = tick() * 12
+        local direction = Vector3.new(math.sin(t) * 60, 0, 0)
+        root.Velocity = Vector3.new(direction.X, root.Velocity.Y, direction.Z)
+    end
+
+    -- Drop Brainrot (dropea todo + mensaje brainrot)
+    if getgenv().Brainrot.DropBrainrot then
+        for _, tool in ipairs(char:GetChildren()) do
+            if tool:IsA("Tool") then
+                tool.Parent = workspace
+            end
+        end
+        -- Mensaje brainrot en chat (opcional)
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("🧠 BRAINROT DROP ACTIVADO 🧠", "All")
+        getgenv().Brainrot.DropBrainrot = false -- se apaga solo después de dropear
+    end
+end)
+
+print("✅ BRAINROT CHEAT cargado correctamente!")
+print("Usa la GUI para activar/desactivar todo. ¡Diviértete rompiendo el lobby! 🔥")
+
+-- Para quitar el cheat completamente: ScreenGui:Destroy()
